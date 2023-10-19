@@ -5,13 +5,23 @@ import logging
 import math
 import numpy as np
 
+# import matplotlib.pyplot as plt
+
+import learning as ml_learning
+
+REGRESSION = ml_learning.supervised.regression
+
 
 class MLInterface:
-    __x_train = np.zeros(2)
-    __y_train = np.zeros(2)
+    __x_train: np.ndarray = np.zeros(2)
+    __y_train: np.ndarray = np.zeros(2)
+    __hist_of_cost: list = list()
+    __hist_of_params: list = list()
 
     def __init__(self):
-        """ """
+        """
+        ML Interface Initialization
+        """
         ...
 
     @property
@@ -30,61 +40,7 @@ class MLInterface:
     def y_train(self, y_train: np.ndarray) -> None:
         self.__y_train = y_train
 
-    @staticmethod
-    def __compute_cost(x: np.ndarray, y: np.ndarray, w, b) -> float:
-        """
-        Computes the cost function for linear regression.
-
-        Args:
-          x (ndarray (m,)): Data, m examples
-          y (ndarray (m,)): target values
-          w,b (scalar)    : model parameters
-
-        Returns
-            total_cost (float): The cost of using w,b as the parameters for linear regression
-                   to fit the data points in x and y
-        """
-        m = x.shape[0]
-        cost = 0
-
-        for i in range(m):
-            f_wb = w * x[i] + b
-            cost = cost + (f_wb - y[i]) ** 2
-        total_cost = 1 / (2 * m) * cost
-
-        return total_cost
-
-    @staticmethod
-    def __compute_gradient(x: np.ndarray, y: np.ndarray, w, b) -> tuple:
-        """
-        Computes the gradient for linear regression
-
-        Args:
-          x (ndarray (m,)): Data, m examples
-          y (ndarray (m,)): target values
-          w,b (scalar)    : model parameters
-        Returns
-          dj_dw (scalar): The gradient of the cost w.r.t. the parameters w
-          dj_db (scalar): The gradient of the cost w.r.t. the parameter b
-        """
-
-        # Number of training examples
-        m = x.shape[0]
-        dj_dw = 0
-        dj_db = 0
-
-        for i in range(m):
-            f_wb = w * x[i] + b
-            dj_dw_i = (f_wb - y[i]) * x[i]
-            dj_db_i = f_wb - y[i]
-            dj_db += dj_db_i
-            dj_dw += dj_dw_i
-        dj_dw = dj_dw / m
-        dj_db = dj_db / m
-
-        return dj_dw, dj_db
-
-    def gradient_descent(self, w_in, b_in, alpha: float, num_iters: int):
+    def gradient_descent(self, algo: REGRESSION.RegressionTypes, w_in, b_in, alpha: float, num_iters: int):
         """
         Performs gradient descent to fit w,b. Updates w,b by taking
         num_iters gradient steps with learning rate alpha
@@ -106,26 +62,37 @@ class MLInterface:
         # An array to store cost J and w's at each iteration primarily for graphing later
         j_history = []
         p_history = []
-        b = b_in
-        w = w_in
+
+        match algo:
+            case REGRESSION.RegressionTypes.LINEAR:
+                ml_model = REGRESSION.LinearRegression(x_train=self.__x_train, y_train=self.__y_train, weights=w_in, bias=b_in)
+            case _:
+                raise ValueError("Algo param not set to valid type")
 
         for i in range(num_iters):
             # Calculate the gradient and update the parameters using gradient_function
-            dj_dw, dj_db = self.__compute_gradient(self.__x_train, self.__y_train, w, b)
+            dj_dw, dj_db = ml_model.compute_gradient()
 
             # Update Parameters using equation (3) above
-            b = b - alpha * dj_db
-            w = w - alpha * dj_dw
+            ml_model.bias = ml_model.bias - alpha * dj_db
+            ml_model.weights = ml_model.weights - alpha * dj_dw
 
             # Save cost J at each iteration
             if i < 100000:  # prevent resource exhaustion
-                j_history.append(self.__compute_cost(self.__x_train, self.__y_train, w, b))
-                p_history.append([w, b])
+                j_history.append(ml_model.compute_cost())
+                p_history.append([ml_model.weights, ml_model.bias])
             # Print cost every at intervals 10 times or as many iterations if < 10
             if i % math.ceil(num_iters / 10) == 0:
-                print(f"Iteration {i:4}: Cost {j_history[-1]:0.2e} ", f"dj_dw: {dj_dw: 0.3e}, dj_db: {dj_db: 0.3e}  ", f"w: {w: 0.3e}, b:{b: 0.5e}")
+                print(
+                    f"Iteration {i:4}: Cost {j_history[-1]:0.2e} ",
+                    f"dj_dw: {dj_dw: 0.3e}, dj_db: {dj_db: 0.3e}  ",
+                    f"w: {ml_model.weights: 0.3e}, b:{ml_model.bias: 0.5e}",
+                )
 
-        return w, b, j_history, p_history  # return w and J,w history for graphing
+        self.__hist_of_cost = j_history
+        self.__hist_of_params = p_history
+
+        return ml_model.weights, ml_model.bias
 
 
 if __name__ in ("__main__", "__builtin__"):
@@ -135,5 +102,7 @@ if __name__ in ("__main__", "__builtin__"):
         filemode="w",
         level=logging.INFO,
     )
+
+    print("# ML Learning Interface\n" "# ---------------------\n" f"# Version: {ml_learning.__version__}")
 
     ml = MLInterface()
