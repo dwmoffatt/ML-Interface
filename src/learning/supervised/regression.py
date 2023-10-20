@@ -55,16 +55,15 @@ class LinearRegression:
 
     def compute_cost(self) -> float:
         """
-        Computes the cost function for linear regression.
+        Computes the cost function for linear regression based on:
+            x_train (ndarray) : Data values
+            y_train (ndarray) : Target values
+            bias    (int) : Model parameters
+            weights (int) : Model parameters
 
-        Args:
-          x (ndarray (m,)): Data, m examples
-          y (ndarray (m,)): target values
-          w,b (scalar)    : model parameters
-
-        Returns
+        :return:
             total_cost (float): The cost of using w,b as the parameters for linear regression
-                   to fit the data points in x and y
+                to fit the data points in x and y
         """
         m = self.__x_train.shape[0]
         cost = 0
@@ -76,17 +75,17 @@ class LinearRegression:
 
         return total_cost
 
-    def compute_gradient(self) -> tuple:
+    def compute_gradient(self) -> (int, int):
         """
         Computes the gradient for linear regression
+            x_train (ndarray) : Data values
+            y_train (ndarray) : Target values
+            bias    (int) : Model parameters
+            weights (int) : Model parameters
 
-        Args:
-          x (ndarray (m,)): Data, m examples
-          y (ndarray (m,)): target values
-          w,b (scalar)    : model parameters
-        Returns
-          dj_dw (scalar): The gradient of the cost w.r.t. the parameters w
-          dj_db (scalar): The gradient of the cost w.r.t. the parameter b
+        :return:
+            dj_dw (int): The gradient of the cost w.r.t. the parameters w
+            dj_db (int): The gradient of the cost w.r.t. the parameter b
         """
 
         # Number of training examples

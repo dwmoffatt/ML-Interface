@@ -46,8 +46,6 @@ class MLInterface:
         num_iters gradient steps with learning rate alpha
 
         Args:
-          x (ndarray (m,))  : Data, m examples
-          y (ndarray (m,))  : target values
           w_in,b_in (scalar): initial values of model parameters
           alpha (float):     Learning rate
           num_iters (int):   number of iterations to run gradient descent
@@ -103,6 +101,10 @@ if __name__ in ("__main__", "__builtin__"):
         level=logging.INFO,
     )
 
-    print("# ML Learning Interface\n" "# ---------------------\n" f"# Version: {ml_learning.__version__}")
+    print(
+        "# ML Learning Interface\n",
+        "# ---------------------\n",
+        f"# Version: {ml_learning.__version__}",
+    )
 
     ml = MLInterface()
