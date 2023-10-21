@@ -30,6 +30,8 @@ class MLInterface:
 
     @x_train.setter
     def x_train(self, x_train: np.ndarray) -> None:
+        if isinstance(x_train, np.ndarray) is not True:
+            raise TypeError("x_train needs to be of type np.ndarray")
         self.__x_train = x_train
 
     @property
@@ -38,6 +40,8 @@ class MLInterface:
 
     @y_train.setter
     def y_train(self, y_train: np.ndarray) -> None:
+        if isinstance(y_train, np.ndarray) is not True:
+            raise TypeError("y_train needs to be of type np.ndarray")
         self.__y_train = y_train
 
     def gradient_descent(self, algo: REGRESSION.RegressionTypes, w_in, b_in, alpha: float, num_iters: int):
